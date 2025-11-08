@@ -9,6 +9,9 @@ import { StatTile } from "./StatTile";
 import { Badge } from "./Badge";
 import { DraggableTaskList } from "./DraggableTaskList";
 import { AIChat } from "./AIChat";
+import { CircularProgress } from "./CircularProgress";
+import { DaysAheadBadge } from "./DaysAheadBadge";
+import { WeeklyGoalsList } from "./WeeklyGoalsList";
 import {
   DndContext,
   closestCenter,
@@ -41,8 +44,16 @@ export function ProjectDetailScreen({ projectId }: ProjectDetailScreenProps) {
   const project = useProjectStore((state) =>
     state.projects.find((p) => p.id === projectId)
   );
-  const { updateTask, deleteTask, reorderTasks, addTask, updateProject } =
-    useProjectStore();
+  const {
+    updateTask,
+    deleteTask,
+    reorderTasks,
+    addTask,
+    updateProject,
+    toggleWeeklyGoal,
+    moveToNextWeek,
+    calculateDaysAhead,
+  } = useProjectStore();
 
   const [components, setComponents] = useState<Component[]>([
     { id: "1", type: "stats" },
@@ -86,6 +97,9 @@ export function ProjectDetailScreen({ projectId }: ProjectDetailScreenProps) {
   const today = new Date().toISOString().split("T")[0];
   const todayTasks = project.dailyTasks?.filter((t) => t.date === today) || [];
   const missedTasks = project.missedTasks || [];
+  
+  // Calculate days ahead/behind
+  const daysAhead = calculateDaysAhead(projectId);
 
   const handleComponentDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -101,8 +115,11 @@ export function ProjectDetailScreen({ projectId }: ProjectDetailScreenProps) {
   const handleTaskToggle = (taskId: string) => {
     const task = project.dailyTasks?.find((t) => t.id === taskId);
     if (task) {
+      const newStatus = task.status === "done" ? "pending" : "done";
       updateTask(projectId, taskId, {
-        status: task.status === "done" ? "pending" : "done",
+        status: newStatus,
+        // When completing, set order to end of list; when uncompleting, set to beginning
+        order: newStatus === "done" ? Date.now() + 1000000 : Date.now(),
       });
     }
   };
@@ -124,7 +141,22 @@ export function ProjectDetailScreen({ projectId }: ProjectDetailScreenProps) {
         return (
           <Card key={component.id} className="p-6">
             <SectionHeader title="Project Statistics" />
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-4">
+              <div className="flex flex-col items-center gap-2">
+                <CircularProgress
+                  value={progress}
+                  size={64}
+                  showLabel
+                  label={`${Math.round(progress)}%`}
+                  color="default"
+                />
+                <p className="text-xs font-medium text-muted uppercase tracking-wide text-center">
+                  Tasks Completed
+                </p>
+                <p className="text-sm text-primary font-semibold">
+                  {completedTasks}/{totalTasks}
+                </p>
+              </div>
               <StatTile
                 label="Days Remaining"
                 value={daysRemaining}
@@ -134,17 +166,17 @@ export function ProjectDetailScreen({ projectId }: ProjectDetailScreenProps) {
                 }
               />
               <StatTile
-                label="Tasks Completed"
-                value={`${completedTasks}/${totalTasks}`}
-                description={`${Math.round(progress)}% done`}
-                trend="up"
-              />
-              <StatTile
                 label="Today"
                 value={todayTasks.length}
                 description="Tasks scheduled"
                 trend="neutral"
               />
+              <div className="flex flex-col gap-2">
+                <p className="text-xs font-medium text-muted uppercase tracking-wide">
+                  Schedule
+                </p>
+                <DaysAheadBadge daysAhead={daysAhead} />
+              </div>
             </div>
           </Card>
         );
@@ -162,15 +194,11 @@ export function ProjectDetailScreen({ projectId }: ProjectDetailScreenProps) {
           project.weeklyGoals &&
           project.weeklyGoals.length > 0 && (
             <Card key={component.id} className="p-6">
-              <SectionHeader title="This Week's Goals" />
-              <ul className="space-y-2 mt-4">
-                {project.weeklyGoals.map((goal, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <span className="text-primary mt-1">•</span>
-                    <span className="text-muted">{goal}</span>
-                  </li>
-                ))}
-              </ul>
+              <WeeklyGoalsList
+                goals={project.weeklyGoals}
+                onToggleGoal={(goalId) => toggleWeeklyGoal(projectId, goalId)}
+                onMoveToNextWeek={() => moveToNextWeek(projectId)}
+              />
             </Card>
           )
         );
@@ -210,11 +238,35 @@ export function ProjectDetailScreen({ projectId }: ProjectDetailScreenProps) {
           )
         );
       case "progress":
+        // Calculate today's task progress
+        const todayCompletedTasks = todayTasks.filter((t) => t.status === "done").length;
+        const todayProgress = todayTasks.length > 0 
+          ? (todayCompletedTasks / todayTasks.length) * 100 
+          : 0;
+        
         return (
           <Card key={component.id} className="p-6">
-            <SectionHeader title="Overall Progress" />
-            <div className="mt-4">
-              <ProgressBar value={progress} showLabel variant="default" />
+            <SectionHeader title="Progress Today" />
+            <div className="mt-4 space-y-4">
+              <ProgressBar
+                value={todayProgress}
+                showLabel
+                variant="default"
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted">Tasks Completed</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {todayCompletedTasks}/{todayTasks.length}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted">Completion Rate</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {Math.round(todayProgress)}%
+                  </p>
+                </div>
+              </div>
             </div>
           </Card>
         );

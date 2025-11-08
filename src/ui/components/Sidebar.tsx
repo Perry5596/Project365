@@ -1,10 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useSettingsStore } from "~/state/useSettingsStore";
 import { useProjectStore } from "~/state/useProjectStore";
 import { Button } from "./Button";
 import { Card } from "./Card";
+import { ProjectContextMenu } from "./ProjectContextMenu";
+import { DeleteProjectModal } from "./DeleteProjectModal";
 import { cn } from "~/lib/utils";
 
 interface SidebarProps {
@@ -23,7 +25,16 @@ export function Sidebar({
   onSettings,
 }: SidebarProps) {
   const { userName, streakDays, updateStreak } = useSettingsStore();
-  const { projects } = useProjectStore();
+  const { projects, deleteProject } = useProjectStore();
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    projectId: string;
+  } | null>(null);
+  const [deleteModal, setDeleteModal] = useState<{
+    projectId: string;
+    projectName: string;
+  } | null>(null);
 
   // Update streak on mount
   React.useEffect(() => {
@@ -42,6 +53,44 @@ export function Sidebar({
       .join("")
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  const handleContextMenu = (e: React.MouseEvent, projectId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      projectId,
+    });
+  };
+
+  const handleEdit = (projectId: string) => {
+    // TODO: Implement edit functionality
+    console.log("Edit project:", projectId);
+    setContextMenu(null);
+  };
+
+  const handleDeleteClick = (projectId: string) => {
+    const project = projects.find((p) => p.id === projectId);
+    if (project) {
+      setDeleteModal({
+        projectId,
+        projectName: project.name,
+      });
+    }
+    setContextMenu(null);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteModal) {
+      deleteProject(deleteModal.projectId);
+      setDeleteModal(null);
+      // If deleted project was selected, navigate to overview
+      if (selectedProjectId === deleteModal.projectId) {
+        onNavigateToOverview();
+      }
+    }
   };
 
   return (
@@ -119,6 +168,7 @@ export function Sidebar({
                 <button
                   key={project.id}
                   onClick={() => onSelectProject(project.id)}
+                  onContextMenu={(e) => handleContextMenu(e, project.id)}
                   className={cn(
                     "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors",
                     selectedProjectId === project.id
@@ -146,6 +196,7 @@ export function Sidebar({
                 <button
                   key={project.id}
                   onClick={() => onSelectProject(project.id)}
+                  onContextMenu={(e) => handleContextMenu(e, project.id)}
                   className={cn(
                     "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors opacity-60",
                     selectedProjectId === project.id
@@ -173,6 +224,26 @@ export function Sidebar({
           </div>
         </Card>
       </div>
+
+      {/* Context Menu */}
+      {contextMenu && (
+        <ProjectContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          onClose={() => setContextMenu(null)}
+          onEdit={() => handleEdit(contextMenu.projectId)}
+          onDelete={() => handleDeleteClick(contextMenu.projectId)}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteModal && (
+        <DeleteProjectModal
+          projectName={deleteModal.projectName}
+          onConfirm={handleDeleteConfirm}
+          onCancel={() => setDeleteModal(null)}
+        />
+      )}
     </div>
   );
 }

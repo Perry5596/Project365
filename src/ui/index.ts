@@ -20,4 +20,9 @@ export { EditableTaskItem } from "./components/EditableTaskItem";
 export { DraggableTaskList } from "./components/DraggableTaskList";
 export { NewTaskForm } from "./components/NewTaskForm";
 export { SortableItem } from "./components/SortableItem";
+export { CircularProgress } from "./components/CircularProgress";
+export { DaysAheadBadge } from "./components/DaysAheadBadge";
+export { WeeklyGoalsList } from "./components/WeeklyGoalsList";
+export { ProjectContextMenu } from "./components/ProjectContextMenu";
+export { DeleteProjectModal } from "./components/DeleteProjectModal";
 

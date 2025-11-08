@@ -108,10 +108,29 @@ export default function Home() {
 
     // Generate sample data
     const longTermGoal = `Successfully achieve: ${data.goals.join(" and ")} within ${data.timeframe} days.`;
+    const weekStartDate = new Date();
+    weekStartDate.setDate(weekStartDate.getDate() - weekStartDate.getDay()); // Get Sunday
+    const weekStartDateStr = weekStartDate.toISOString().split("T")[0]!;
+    
     const weeklyGoals = [
-      "Complete initial research and planning",
-      "Set up necessary resources and tools",
-      "Begin executing core tasks",
+      {
+        id: crypto.randomUUID(),
+        text: "Complete initial research and planning",
+        completed: false,
+        weekStartDate: weekStartDateStr,
+      },
+      {
+        id: crypto.randomUUID(),
+        text: "Set up necessary resources and tools",
+        completed: false,
+        weekStartDate: weekStartDateStr,
+      },
+      {
+        id: crypto.randomUUID(),
+        text: "Begin executing core tasks",
+        completed: false,
+        weekStartDate: weekStartDateStr,
+      },
     ];
 
     const today = new Date();
@@ -139,6 +158,8 @@ export default function Home() {
       weeklyGoals,
       dailyTasks,
       missedTasks: [],
+      currentWeekStartDate: weekStartDateStr,
+      daysAhead: 0,
     });
 
     // Navigate to project detail

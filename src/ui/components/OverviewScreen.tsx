@@ -104,12 +104,28 @@ export function OverviewScreen() {
           </Card>
         );
       case "progress":
+        // Calculate today's task progress across all projects
+        const today = new Date().toISOString().split("T")[0];
+        const todayTasksAll = projects.reduce(
+          (sum, p) => sum + (p.dailyTasks?.filter((t) => t.date === today).length || 0),
+          0
+        );
+        const todayCompletedTasksAll = projects.reduce(
+          (sum, p) =>
+            sum +
+            (p.dailyTasks?.filter((t) => t.date === today && t.status === "done").length || 0),
+          0
+        );
+        const todayProgressAll = todayTasksAll > 0 
+          ? (todayCompletedTasksAll / todayTasksAll) * 100 
+          : 0;
+        
         return (
           <Card key={component.id} className="p-6">
-            <SectionHeader title="Overall Progress" />
+            <SectionHeader title="Overall Progress Today" />
             <div className="mt-4 space-y-4">
               <ProgressBar
-                value={overallProgress}
+                value={todayProgressAll}
                 showLabel
                 variant="default"
               />
@@ -117,13 +133,13 @@ export function OverviewScreen() {
                 <div>
                   <p className="text-sm text-muted">Tasks Completed</p>
                   <p className="text-2xl font-bold text-primary">
-                    {completedTasks}/{totalTasks}
+                    {todayCompletedTasksAll}/{todayTasksAll}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-muted">Completion Rate</p>
                   <p className="text-2xl font-bold text-primary">
-                    {Math.round(overallProgress)}%
+                    {Math.round(todayProgressAll)}%
                   </p>
                 </div>
               </div>
