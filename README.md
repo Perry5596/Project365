@@ -5,12 +5,13 @@
 <p><strong>AI-assisted, open source goal tracker and strategist for the next 365 days of your life.</strong></p>
 
 <!-- Badges -->
-
 <p>
   <img alt="Status" src="https://img.shields.io/badge/status-early%20development-orange">
+  <img alt="Platform" src="https://img.shields.io/badge/platform-web%20first-blue">
   <img alt="Made with TypeScript" src="https://img.shields.io/badge/language-TypeScript-3178c6?logo=typescript&logoColor=white">
   <img alt="React Native" src="https://img.shields.io/badge/framework-React%20Native-61dafb?logo=react&logoColor=white">
   <img alt="Expo" src="https://img.shields.io/badge/runtime-Expo-000020?logo=expo&logoColor=white">
+  <img alt="NativeWind" src="https://img.shields.io/badge/styling-NativeWind-38b2ac">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-success">
   <img alt="Open Source Love" src="https://img.shields.io/badge/open%20source-%E2%99%A5-brightgreen">
 </p>
@@ -18,6 +19,11 @@
 <p>
 Project 365 is an <strong>entirely open source</strong> application that uses AI to create and maintain
 a <em>“you-can’t-reasonably-fail”</em> plan to hit any goal in 365 days or less.
+</p>
+
+<p>
+<strong>Current focus:</strong> Web-first experience using <code>Expo</code> + <code>React Native Web</code>, styled with <code>NativeWind</code>.
+Mobile and native desktop targets will come later.
 </p>
 
 </div>
@@ -35,8 +41,23 @@ Project 365 is a Notion-like planning app that helps you:
 
 The core idea: if you follow the plan exactly, it should be **unreasonable** for you to fail.
 
-You bring the goals and discipline.
+You bring the goals and discipline.  
 The app brings structure, visibility, and relentless reminders.
+
+---
+
+## 🌐 Web-First Architecture
+
+Right now, Project 365 is being built as a **web-first application**:
+
+- Built with **React Native + Expo + React Native Web**
+- Designed primarily for **desktop browser** use (laptop/monitor viewport)
+- Uses **NativeWind** for styling:
+  - Tailwind-style utility classes
+  - Native-feeling components that still render well on web
+- Mobile/native builds are planned, but the **initial UX is optimized for web**:
+  - Think “Notion/Cals-style” dashboard in a browser tab
+  - Future: mobile app and desktop wrappers (Electron/Tauri) reusing the same codebase
 
 ---
 
@@ -84,7 +105,7 @@ The UX is inspired by:
 - **Cal.com / CalAI** – modern scheduling feel with strong emphasis on time and commitment
 - **useMotion** – smooth, subtle motion and interactions
 
-Planned UI characteristics:
+Planned UI characteristics (web-first):
 
 - Project dashboard with cards showing:
   - Title, days remaining, and status
@@ -95,18 +116,21 @@ Planned UI characteristics:
   - Suggest adjustments
   - Apply structural changes to the project
 
+All styled using **NativeWind**, so the same components can later feel at home on iOS/Android without rewriting styles.
+
 ---
 
 ## 🗺️ Roadmap (High-Level)
 
 This project is under active early development. Planned phases:
 
-### Phase 1 – Foundations
+### Phase 1 – Web Foundations (current focus)
 
-- [ ] React Native + Expo + TypeScript setup
+- [ ] Expo + React Native + React Native Web + TypeScript setup
+- [ ] NativeWind configuration and base design system
 - [ ] Local-first storage (e.g. SQLite or similar)
 - [ ] Basic project + task data model
-- [ ] Simple dashboard & project screens
+- [ ] Web dashboard & project screens
 - [ ] Manual tasks (no AI yet)
 
 ### Phase 2 – AI Planning
@@ -124,17 +148,17 @@ This project is under active early development. Planned phases:
 - [ ] Automatic “missed tasks” handling:
   - [ ] Move incomplete tasks to weekly missed list
   - [ ] Weekly wipe of missed tasks
-- [ ] Notifications & reminders:
+- [ ] Notifications & reminders (web-first):
   - [ ] Daily plan reminders
   - [ ] “You’re behind” nudges
   - [ ] “You’re ahead – want to ramp up?” prompts
 
 ### Phase 4 – Polish & Ecosystem
 
-- [ ] Theming (light/dark) and design system
-- [ ] Better desktop experience
+- [ ] Theming (light/dark) and design system refinement with NativeWind
+- [ ] Better desktop web experience (hotkeys, layout tweaks)
 - [ ] Contributor docs, issue templates, and a stable `v0.1.0` release
-- [ ] Explore backend sync & tRPC (optional future direction)
+- [ ] Explore desktop wrappers & native mobile builds (reuse same code)
 
 ---
 
@@ -150,7 +174,6 @@ Project 365 is designed to be:
   - Want custom visualizations? Build on top of the existing components.
 
 Community contributions are welcome once the core architecture stabilizes:
-
 - New views/components
 - Better prompts and schemas
 - Integrations (calendar, wearable data, etc.)
@@ -170,6 +193,7 @@ cd Project365
 # Install dependencies
 pnpm install    # or yarn / npm
 
-# Run in development (Expo)
-pnpm start
-```
+# Run in development (Expo, web-first)
+pnpm expo start --web
+# or
+pnpm start -- --web
