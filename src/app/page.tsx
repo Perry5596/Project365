@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { LatestPost } from "~/app/_components/post";
 import { api, HydrateClient } from "~/trpc/server";
 
 export default async function Home() {
@@ -11,42 +10,25 @@ export default async function Home() {
   return (
     <HydrateClient>
       <main className="flex min-h-screen flex-col items-center justify-center bg-background">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <h1 className="text-5xl font-extrabold tracking-tight text-primary sm:text-[5rem]">
-            Create <span className="text-accent">T3</span> App
-          </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-2xl border border-border bg-surface p-4 shadow-sm transition-colors hover:bg-surface-alt"
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold text-primary">First Steps →</h3>
-              <div className="text-lg text-muted">
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-2xl border border-border bg-surface p-4 shadow-sm transition-colors hover:bg-surface-alt"
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold text-primary">Documentation →</h3>
-              <div className="text-lg text-muted">
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-primary">
-              {hello ? hello.greeting : "Loading tRPC query..."}
-            </p>
-          </div>
+        {/* First time loading screen */}
+        {/* TODO: Welcome screen, credits to myself for open sourcing, and a button to get started */}
+        {/*       After pressing the button, it tells them about the app, and then it takes the user */}
+        {/*       through a series of steps. The first step is to input their name, and their API key */}
+        {/*       from open ai. After that, it loads the main screen of the app. */}
 
-          <LatestPost />
-        </div>
+        {/* Main screen of the app */}
+        {/* TODO: Main screen will look like a dashboard, with a sidebar on the left, and a main content */}
+        {/*       area on the right, with an additional banner on the top that says Project 365, along with */}
+        {/*       the user's name, amount of projects they have, amount of projects completed, and then there */}
+        {/*       will be a button to create a new project. This will be in the middle of the right side of */}
+        {/*       the screen. The user will be able to click on the button to create a new project, and then it */}
+        {/*       will take them to the project creation screen. The project creation screen will look like a */}
+        {/*       form, with a text input for the project name, a text input for the project description, and a */}
+        {/*       button to continue. Then it will take them to the AI screen, where After creating the project, it will take them to the project */}
+        {/*       screen. The project screen will look like a dashboard, with a sidebar on the left, and a main */}
+        {/*       content area on the right, with an additional banner on the top that says Project 365, along with */}
+        {/*       the project name, amount of tasks they have, amount of tasks completed, and then there will be a */}
+        {/*       button to create a new task. This will be in the middle of the right side of the screen. The user */}
       </main>
     </HydrateClient>
   );

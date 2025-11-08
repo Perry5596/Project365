@@ -3,8 +3,8 @@
 ## 0. Repo & Project Setup
 
 - [X] Create new public GitHub repo: `Project365`.
-- [ ] Initialize app with Vite + React + TypeScript:
-  - [ ] `npm create vite@latest project-365 -- --template react-ts`
+- [X] Initialize app with Vite + React + TypeScript:
+  - [X] `npm create vite@latest project-365 -- --template react-ts`
 - [ ] Set up base folder structure:
   - [ ] `src/domain`
   - [ ] `src/state`
@@ -13,29 +13,29 @@
   - [ ] `src/ai`
   - [ ] `src/services`
   - [ ] `docs/`
-- [ ] Configure TypeScript:
-  - [ ] Ensure `"strict": true` in `tsconfig.json`.
-- [ ] Add ESLint + Prettier with basic configs and `lint` script.
-- [ ] Choose license (MIT) and add `LICENSE`.
-- [ ] Add `.cursor/rules` folder (global, ui-ux, ai-planning, state-data, notifications).
-- [ ] Verify dev server:
-  - [ ] `npm install`
-  - [ ] `npm run dev`
-  - [ ] App renders basic placeholder.
+- [X] Configure TypeScript:
+  - [X] Ensure `"strict": true` in `tsconfig.json`.
+- [X] Add ESLint + Prettier with basic configs and `lint` script.
+- [X] Choose license (MIT) and add `LICENSE`.
+- [X] Add `.cursor/rules` folder (global, ui-ux, ai-planning, state-data, notifications).
+- [X] Verify dev server:
+  - [X] `npm install`
+  - [X] `npm run dev`
+  - [X] App renders basic placeholder.
 
 ## 1. Styling & Tailwind CSS
 
-- [ ] Install Tailwind CSS & dependencies (per Tailwind + Vite guide).
-- [ ] Initialize Tailwind:
-  - [ ] `npx tailwindcss init -p`
-- [ ] Configure `tailwind.config.(js|ts)`:
-  - [ ] Set `content` to include `index.html`, `src/**/*.{ts,tsx}`.
-  - [ ] Extend theme with:
-    - [ ] Colors: background, surface, border, accent, danger, success.
-    - [ ] Typography scale.
-    - [ ] Radii & shadows.
-- [ ] Add Tailwind base styles in `src/index.css`:
-  - [ ] `@tailwind base; @tailwind components; @tailwind utilities;`
+- [X] Install Tailwind CSS & dependencies (per Tailwind + Vite guide).
+- [X] Initialize Tailwind:
+  - [X] `npx tailwindcss init -p`
+- [X] Configure `tailwind.config.(js|ts)`:
+  - [X] Set `content` to include `index.html`, `src/**/*.{ts,tsx}`.
+  - [X] Extend theme with:
+    - [X] Colors: background, surface, border, accent, danger, success.
+    - [X] Typography scale.
+    - [X] Radii & shadows.
+- [X] Add Tailwind base styles in `src/index.css`:
+  - [X] `@tailwind base; @tailwind components; @tailwind utilities;`
 - [ ] Create base layout & components using Tailwind:
   - [ ] `AppShell` (sidebar + main panel).
   - [ ] `Button`, `Card`, `Tag`, `StatTile`, `TaskItem`.
