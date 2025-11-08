@@ -4,25 +4,49 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
-  /* Background colors */
+  /* Light mode colors - GitHub dark inspired */
   --color-background: #ffffff;
   --color-surface: #ffffff;
-  --color-surface-alt: #CFCFCF;
+  --color-surface-alt: #f6f8fa;
 
-  /* Primary colors (grayscale palette) */
-  --color-primary: #252525;
-  --color-primary-soft: #545454;
+  /* Primary colors - GitHub dark blue */
+  --color-primary: #2596be;
+  --color-primary-soft: #58a8c7;
 
   /* Accent colors */
-  --color-accent: #545454;
-  --color-accent-soft: #7D7D7D;
+  --color-accent: #2596be;
+  --color-accent-soft: #58a8c7;
 
-  /* Semantic colors (grayscale variants) */
-  --color-success: #7D7D7D;
-  --color-warning: #545454;
-  --color-danger: #252525;
+  /* Semantic colors */
+  --color-success: #28a745;
+  --color-warning: #ffc107;
+  --color-danger: #dc3545;
 
   /* Neutral colors */
-  --color-muted: #7D7D7D;
-  --color-border: #CFCFCF;
+  --color-muted: #6c757d;
+  --color-border: #e1e4e8;
+}
+
+/* Dark mode colors - GitHub dark theme */
+.dark {
+  --color-background: #0d1117;
+  --color-surface: #161b22;
+  --color-surface-alt: #21262d;
+
+  /* Primary colors - GitHub dark blue */
+  --color-primary: #58a8c7;
+  --color-primary-soft: #7bc4d8;
+
+  /* Accent colors */
+  --color-accent: #58a8c7;
+  --color-accent-soft: #7bc4d8;
+
+  /* Semantic colors */
+  --color-success: #3fb950;
+  --color-warning: #d29922;
+  --color-danger: #f85149;
+
+  /* Neutral colors */
+  --color-muted: #8b949e;
+  --color-border: #30363d;
 }

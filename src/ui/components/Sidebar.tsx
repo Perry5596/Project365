@@ -100,7 +100,7 @@ export function Sidebar({
         <div className="flex items-center gap-3">
           <button
             onClick={onNavigateToOverview}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors cursor-pointer"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-black text-sm font-semibold hover:bg-primary/90 transition-colors cursor-pointer"
           >
             {userName ? getInitials(userName) : "U"}
           </button>
@@ -172,12 +172,15 @@ export function Sidebar({
                   className={cn(
                     "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors",
                     selectedProjectId === project.id
-                      ? "bg-primary text-white"
+                      ? "bg-primary text-black"
                       : "text-primary hover:bg-surface-alt"
                   )}
                 >
                   <p className="truncate font-medium">{project.name}</p>
-                  <p className="text-xs opacity-75">
+                  <p className={cn(
+                    "text-xs",
+                    selectedProjectId === project.id ? "opacity-75" : "opacity-75"
+                  )}>
                     {project.status === "planning" ? "Planning..." : "Active"}
                   </p>
                 </button>
@@ -200,7 +203,7 @@ export function Sidebar({
                   className={cn(
                     "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors opacity-60",
                     selectedProjectId === project.id
-                      ? "bg-primary text-white"
+                      ? "bg-primary text-black"
                       : "text-primary hover:bg-surface-alt"
                   )}
                 >

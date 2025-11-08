@@ -10,25 +10,25 @@ const config: Config = {
     extend: {
       colors: {
         // NOTE: These color values are user-customizable in the future
-        // Current theme uses grayscale palette: #252525, #CFCFCF, #7D7D7D, #545454
+        // Current theme uses GitHub dark inspired palette with #2596be as primary
         
         // Background colors
         background: "#ffffff",
         surface: "#ffffff",
-        "surface-alt": "#CFCFCF",
-        // Primary colors (using grayscale palette)
-        primary: "#252525",
-        "primary-soft": "#545454",
+        "surface-alt": "#f6f8fa",
+        // Primary colors (GitHub dark blue)
+        primary: "#2596be",
+        "primary-soft": "#58a8c7",
         // Accent colors
-        accent: "#545454",
-        "accent-soft": "#7D7D7D",
-        // Semantic colors (grayscale variants)
-        success: "#7D7D7D",
-        warning: "#545454",
-        danger: "#252525",
+        accent: "#2596be",
+        "accent-soft": "#58a8c7",
+        // Semantic colors
+        success: "#28a745",
+        warning: "#ffc107",
+        danger: "#dc3545",
         // Neutral colors
-        muted: "#7D7D7D",
-        border: "#CFCFCF",
+        muted: "#6c757d",
+        border: "#e1e4e8",
       },
     },
   },

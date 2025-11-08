@@ -25,4 +25,5 @@ export { DaysAheadBadge } from "./components/DaysAheadBadge";
 export { WeeklyGoalsList } from "./components/WeeklyGoalsList";
 export { ProjectContextMenu } from "./components/ProjectContextMenu";
 export { DeleteProjectModal } from "./components/DeleteProjectModal";
+export { ThemeProvider } from "./components/ThemeProvider";
 

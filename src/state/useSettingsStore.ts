@@ -7,10 +7,13 @@ interface SettingsState {
   hasCompletedOnboarding: boolean;
   streakDays: number;
   lastActiveDate: string | null;
+  theme: "light" | "dark";
   setOpenAIApiKey: (key: string) => void;
   setUserName: (name: string) => void;
   completeOnboarding: () => void;
   updateStreak: () => void;
+  toggleTheme: () => void;
+  setTheme: (theme: "light" | "dark") => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -21,9 +24,12 @@ export const useSettingsStore = create<SettingsState>()(
       hasCompletedOnboarding: false,
       streakDays: 0,
       lastActiveDate: null,
+      theme: "light",
       setOpenAIApiKey: (key) => set({ openAIApiKey: key }),
       setUserName: (name) => set({ userName: name }),
       completeOnboarding: () => set({ hasCompletedOnboarding: true }),
+      toggleTheme: () => set((state) => ({ theme: state.theme === "light" ? "dark" : "light" })),
+      setTheme: (theme) => set({ theme }),
       updateStreak: () => {
         const today = new Date().toISOString().split("T")[0];
         set((state) => {
