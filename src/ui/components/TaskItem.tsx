@@ -54,7 +54,7 @@ export const TaskItem = forwardRef<HTMLDivElement, TaskItemProps>(
             >
               {title}
             </label>
-            <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex items-center gap-2 shrink-0">
               {isMissed && <Badge variant="warning">Missed</Badge>}
               {effortEstimate && (
                 <Badge variant="muted">{effortEstimate}</Badge>
