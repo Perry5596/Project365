@@ -2,123 +2,143 @@
 
 ## Overall Look & Feel
 
-Target a hybrid of:
+Inspiration:
 
 - **Notion**:
   - Clean, minimal.
-  - Blocks/cards, translucent panels.
+  - Blocks/cards, lots of whitespace.
 - **Cal.com / CalAI**:
   - Subtle rounded corners.
   - Strong but soft typography.
-  - Clear emphasis on primary actions.
+  - Clear primary actions.
 - **useMotion**:
   - Smooth micro-interactions.
-  - Subtle motion, not flashy.
+  - Subtle transitions, not flashy.
 
 ## Platform Focus
 
-- **Web-first**:
-  - Primary experience is desktop browser (laptop/monitor).
-  - Layout should assume a wide viewport (e.g. 1200–1440px) and scale down gracefully.
-- Plan designs so they can later map nicely to mobile and native desktop, but **optimize now for web**.
+- **Web-only**:
+  - Primary experience is desktop browsers (laptop/monitor).
+  - Layout assumes a wide viewport (1200–1440px) and scales down gracefully.
 
 ## Layout Principles
 
-- Main app layout (web):
+- Main layout:
 
   - Left sidebar:
-    - Projects list (with status and days remaining).
-    - Quick filters (Active, Completed, Behind schedule).
+    - Projects list (status, days remaining).
+    - Filters (Active, Completed, Behind).
   - Main content:
     - Project overview, timeline, tasks, missed tasks.
-  - Right-side panel (optional):
-    - AI assistant pane or project insights.
+  - Optional right-side panel:
+    - AI assistant, insights, or stats.
 
-- Within a project:
-  - Top: Project header (title, goal summary, days remaining, days behind/ahead).
-  - Middle: Tabs or sections:
-    - “Today”
-    - “Week”
-    - “Plan” (milestones)
-    - “Missed Tasks”
-  - Bottom or side: AI “Ask anything” bar.
+- Inside a project:
 
-Use flexbox/grid and NativeWind utility classes to create responsive layouts.
+  - Header:
+    - Title, description snippet.
+    - Days remaining, days behind/ahead.
+    - Status badge.
+  - Body sections/tabs:
+    - Today
+    - Week
+    - Plan (milestones)
+    - Missed Tasks
+  - AI bar/panel:
+    - Input field to send commands to AI.
+    - Chat-like history and summaries.
+
+Use Tailwind for layout and spacing (`flex`, `grid`, `gap`, `px`, `py`).
 
 ## Component System
 
-Define and reuse primitives in `src/ui/components`:
+Put shared components in `src/ui/components`:
 
-- `Button` (primary, secondary, ghost)
-- `Card` (with optional header, body, footer)
-- `Tag` / `Badge` (for statuses)
-- `ProgressBar` (for % of tasks completed)
-- `StatTile` (for key metrics: days remaining, days behind, completion %)
-- `TaskItem` (checkbox, title, subtasks, due status)
-- `SectionHeader` for grouping content
+- `Button`
+- `Card`
+- `Tag` / `Badge`
+- `ProgressBar`
+- `StatTile`
+- `TaskItem`
+- `SectionHeader`
+- `Sidebar`, `AppShell`
 
-Each should be styled with **NativeWind**:
+Each uses Tailwind classes, e.g.:
 
-- Use Tailwind-like classes: e.g. `className="rounded-2xl bg-surface px-4 py-3 shadow-sm"`
-- Keep theme-consistent tokens (colors, radii) referenced via design tokens mapped into classes.
+- `Button`:
+  - `className="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium bg-accent text-white hover:bg-accent/90"`
+- `Card`:
+  - `className="rounded-2xl border border-border bg-surface shadow-sm p-4"`
 
-### Theming
+Prefer **semantic utilities** via Tailwind theme:
 
-Centralized theme in `src/ui/theme.ts` with tokens:
+- Colors like `bg-surface`, `text-primary`, `border-border`.
+- Not raw HEX values scattered everywhere.
 
-- Colors (example names, not exact values):
-  - `color.background`, `color.backgroundAlt`
-  - `color.surface`, `color.surfaceAlt`
-  - `color.textPrimary`, `color.textSecondary`, `color.textMuted`
-  - `color.accent`, `color.accentSoft`
-  - `color.danger`, `color.warning`, `color.success`
+## Theming
+
+Centralize theme in `tailwind.config.(js|ts)`:
+
+- Colors:
+  - `background`, `surface`, `surface-alt`
+  - `primary`, `primary-soft`
+  - `accent`, `accent-soft`
+  - `danger`, `warning`, `success`
+  - `muted`, `border`
 - Typography:
-  - `font.heading`, `font.body`, `font.mono`
-  - Sizes: `xs, sm, md, lg, xl, 2xl, 3xl`
+  - Base font, heading font.
+  - Sizes: `xs, sm, base, lg, xl, 2xl, 3xl`.
 - Radii:
-  - `radius.sm`, `radius.md`, `radius.lg`, `radius.xl` (cards/buttons should feel soft, e.g. `radius.lg`).
+  - Small, medium, large (e.g. `rounded-lg`, `rounded-2xl`).
 - Shadows:
-  - `shadow.sm`, `shadow.md` for subtle depth.
+  - `shadow-sm`, `shadow-md` for subtle depth.
 
-Apply these tokens through NativeWind configuration (tailwind config theme extensions) so components can use consistent classes such as `bg-background`, `text-primary`, etc.
+Support **light and dark mode**:
 
-Support both **light and dark modes** from day one, with a simple toggle in settings.
+- Use `dark:` variants in Tailwind.
+- Wrap app in a theme provider or rely on `class="dark"` on `<html>` or `<body>`.
 
-### Interactions
+## Interactions
 
 - Task completion:
-  - Checkbox or tap area with subtle animation (scale/fade).
-  - Completed tasks fade slightly, but remain readable.
+  - Checkbox + label with subtle animation (`transition`, `scale-95` on click).
+  - Completed tasks:
+    - `opacity-60` and maybe line-through, but still readable.
 - Missed tasks:
-  - Visually distinct (e.g. tag “Missed” + subtle warning color).
-- “Days remaining” & “days behind”:
+  - Display a small badge:
+    - `className="inline-flex items-center rounded-full bg-warning/10 text-warning px-2 py-0.5 text-xs"`
+- Days remaining / behind:
   - Always visible in project header.
-  - “Behind” uses warning/danger color; “Ahead” uses success/positive color.
+  - Behind:
+    - Use warning/danger colors.
+  - Ahead:
+    - Use success/positive colors.
 
-### Accessibility
+Add light transitions:
+
+- Use `transition-colors`, `transition-transform` for hover/focus.
+
+## Accessibility
 
 - Aim for WCAG AA contrast.
-- Support:
-  - Font size scaling (respect browser zoom).
-  - Keyboard navigation:
-    - Focus states on key interactive components.
-    - Tab order that makes sense.
-- Avoid color-only status indicators; always include icon/text.
+- Keyboard accessibility:
+  - `tabIndex` where necessary.
+  - Visible focus outlines (`focus-visible:ring`).
+- Avoid color-only cues:
+  - Combine color + text/badge/icon for status.
 
-### AI Assistant UI
+## AI Assistant UI
 
-- AI interaction should:
-  - Live in a panel with chat-like UI, but focused on **commands that modify the project**.
-  - Allow user to:
-    - Preview changes before applying when possible.
-  - Show:
-    - “Summary of change” before committing.
+- Panel layout:
+  - Right side panel or bottom dock.
+- Show:
+  - Chat history (user message, AI response).
+  - Summary of modifications before they’re applied.
+- Allow:
+  - Confirm/Cancel flow on structural updates (e.g., replan, shorten timeline).
 
-### Cursor Guidance
+## Cursor Guidance
 
-- When adding new components:
-  - Put them in `src/ui/components`.
-  - Export them from `src/ui/index.ts` for easy imports.
-- Prefer NativeWind classes over inline styles.
-- Avoid:
-  - Copy-pasted markup; refactor shared patterns into components.
+- New reusable UI patterns go into `src/ui/components`.
+- Export from `src/ui/index.ts` to keep imports clean.
+- Use Tailwind utility classes; avoid inline styles except for rare cases.

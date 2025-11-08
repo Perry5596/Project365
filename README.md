@@ -5,14 +5,13 @@
 <p><strong>AI-assisted, open source goal tracker and strategist for the next 365 days of your life.</strong></p>
 
 <!-- Badges -->
-
 <p>
   <img alt="Status" src="https://img.shields.io/badge/status-early%20development-orange">
-  <img alt="Platform" src="https://img.shields.io/badge/platform-web%20first-blue">
+  <img alt="Platform" src="https://img.shields.io/badge/platform-web%20only-blue">
   <img alt="Made with TypeScript" src="https://img.shields.io/badge/language-TypeScript-3178c6?logo=typescript&logoColor=white">
-  <img alt="React Native" src="https://img.shields.io/badge/framework-React%20Native-61dafb?logo=react&logoColor=white">
-  <img alt="Expo" src="https://img.shields.io/badge/runtime-Expo-000020?logo=expo&logoColor=white">
-  <img alt="NativeWind" src="https://img.shields.io/badge/styling-NativeWind-38b2ac">
+  <img alt="React" src="https://img.shields.io/badge/framework-React-61dafb?logo=react&logoColor=white">
+  <img alt="Bundler" src="https://img.shields.io/badge/build-Vite-646CFF?logo=vite&logoColor=white">
+  <img alt="Styling" src="https://img.shields.io/badge/styling-Tailwind%20CSS-38b2ac?logo=tailwindcss&logoColor=white">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-success">
   <img alt="Open Source Love" src="https://img.shields.io/badge/open%20source-%E2%99%A5-brightgreen">
 </p>
@@ -23,8 +22,7 @@ a <em>“you-can’t-reasonably-fail”</em> plan to hit any goal in 365 days or
 </p>
 
 <p>
-<strong>Current focus:</strong> Web-first experience using <code>Expo</code> + <code>React Native Web</code>, styled with <code>NativeWind</code>.
-Mobile and native desktop targets will come later.
+<strong>Current focus:</strong> Web-only experience using <code>React</code> + <code>TypeScript</code> + <code>Vite</code>, styled with <code>Tailwind CSS</code>.
 </p>
 
 </div>
@@ -33,7 +31,7 @@ Mobile and native desktop targets will come later.
 
 ## ✨ What is Project 365?
 
-Project 365 is a Notion-like planning app that helps you:
+Project 365 is a Notion-like planning web app that helps you:
 
 - Define a goal (fitness, business, learning, creative, etc.)
 - Timebox it to ≤ 365 days
@@ -47,18 +45,14 @@ The app brings structure, visibility, and relentless reminders.
 
 ---
 
-## 🌐 Web-First Architecture
+## 🌐 Web-Only Architecture (for now)
 
-Right now, Project 365 is being built as a **web-first application**:
+Right now, Project 365 is being built as a **web-only application**:
 
-- Built with **React Native + Expo + React Native Web**
-- Designed primarily for **desktop browser** use (laptop/monitor viewport)
-- Uses **NativeWind** for styling:
-  - Tailwind-style utility classes
-  - Native-feeling components that still render well on web
-- Mobile/native builds are planned, but the **initial UX is optimized for web**:
-  - Think “Notion/Cals-style” dashboard in a browser tab
-  - Future: mobile app and desktop wrappers (Electron/Tauri) reusing the same codebase
+- Built with **React + TypeScript** and **Vite** as the bundler.
+- Designed primarily for a **desktop browser** experience (laptop/monitor viewport).
+- Uses **Tailwind CSS** for styling and a clean design system.
+- Future directions (native desktop wrappers, mobile) can reuse the same core logic and components, but all initial effort is focused on the browser.
 
 ---
 
@@ -106,7 +100,7 @@ The UX is inspired by:
 - **Cal.com / CalAI** – modern scheduling feel with strong emphasis on time and commitment
 - **useMotion** – smooth, subtle motion and interactions
 
-Planned UI characteristics (web-first):
+Planned UI characteristics (web-only for now):
 
 - Project dashboard with cards showing:
   - Title, days remaining, and status
@@ -117,7 +111,7 @@ Planned UI characteristics (web-first):
   - Suggest adjustments
   - Apply structural changes to the project
 
-All styled using **NativeWind**, so the same components can later feel at home on iOS/Android without rewriting styles.
+All styled using **Tailwind CSS** to keep the dev loop fast and the design consistent.
 
 ---
 
@@ -127,9 +121,9 @@ This project is under active early development. Planned phases:
 
 ### Phase 1 – Web Foundations (current focus)
 
-- [ ] Expo + React Native + React Native Web + TypeScript setup
-- [ ] NativeWind configuration and base design system
-- [ ] Local-first storage (e.g. SQLite or similar)
+- [ ] Vite + React + TypeScript setup
+- [ ] Tailwind CSS configuration and base design system
+- [ ] Local-first storage (e.g. IndexedDB/localStorage abstraction)
 - [ ] Basic project + task data model
 - [ ] Web dashboard & project screens
 - [ ] Manual tasks (no AI yet)
@@ -156,10 +150,10 @@ This project is under active early development. Planned phases:
 
 ### Phase 4 – Polish & Ecosystem
 
-- [ ] Theming (light/dark) and design system refinement with NativeWind
+- [ ] Theming (light/dark) and design system refinement with Tailwind
 - [ ] Better desktop web experience (hotkeys, layout tweaks)
 - [ ] Contributor docs, issue templates, and a stable `v0.1.0` release
-- [ ] Explore desktop wrappers & native mobile builds (reuse same code)
+- [ ] Explore desktop wrappers & mobile clients as future directions
 
 ---
 
@@ -191,10 +185,11 @@ Community contributions are welcome once the core architecture stabilizes:
 git clone https://github.com/Perry5596/Project365.git
 cd Project365
 
-# Install dependencies
-pnpm install    # or yarn / npm
+# Create the app (if not already created)
+# npm create vite@latest . -- --template react-ts
 
-# Run in development (Expo, web-first)
-pnpm expo start --web
-# or
-pnpm start -- --web
+# Install dependencies
+npm install    # or pnpm / yarn
+
+# Run in development (web)
+npm run dev

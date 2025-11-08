@@ -4,43 +4,53 @@
 
 Implement a **configurable notification system** that nudges users without being obnoxious.
 
-Initial focus is **web**:
-- Use browser notifications where possible.
-- Design APIs so they can later support mobile/native notifications with Expo.
+Initial focus is **web-only**:
+
+- Use the browser Notification API when permitted.
+- Fall back to in-app banners/toasts when notifications are blocked or unavailable.
 
 ## Design
 
-- Abstract notifications behind a service in `src/services/notifications`:
-  - `scheduleDailyReminder(timeOfDay, payload)`
-  - `cancelDailyReminder(id)`
-  - `fireImmediateNotification(payload)`
-- This service chooses the underlying platform:
-  - For web: browser Notification API (with permission checks) or fallback in-app banners.
-  - For mobile/Expo (later): use `expo-notifications` or equivalent.
+Abstract notifications in `src/services/notifications`:
+
+- `requestPermission(): Promise<NotificationPermission>`
+- `scheduleDailyReminder(timeOfDay, payload)`
+- `cancelDailyReminder(id)`
+- `showImmediateNotification(payload)`
+
+Implementation:
+
+- For now:
+  - Browser Notification API + `setTimeout` / scheduling logic while the app is open.
+  - Future: integration with a backend or service worker for more reliable schedules if needed.
 
 ## Notification Types
 
 - Daily “Today’s plan” reminder.
 - “You are X days behind” alert.
-- “You’re ahead of schedule—want to tighten your deadline or ramp up?” prompt.
+- “You’re ahead of schedule—want to tighten your deadline or ramp up?” prompts.
 - Optional “Weekly review” reminder.
 
-All types should:
+All must be:
 
-- Be toggleable in Settings.
-- Respect platform-level permissions and user choices.
+- Toggleable in Settings.
+- Respect user/broswer permissions.
 
 ## Scheduling Rules
 
 - Daily reminder:
   - Use user-configured local time.
-- Behind schedule notification:
-  - Trigger only once when crossing new thresholds (e.g., 1, 3, 7 days behind).
-- Ahead schedule notification:
-  - Trigger when ahead by a configured threshold (e.g., 7 days).
+  - When app is open, show Notification or in-app banner around that time.
+- Behind schedule alerts:
+  - Trigger only when crossing thresholds (e.g., 1, 3, 7 days behind).
+- Ahead-of-schedule alerts:
+  - Trigger when ahead by a defined threshold.
 
 ## Cursor Guidance
 
-- Do not hard-code times; read them from `Settings`.
-- Provide graceful degradation if notifications are not available on the platform:
-  - e.g. show inline in-app banners instead of OS-level notifications.
+- Do not assume notifications are available; always check permissions.
+- Gracefully fall back:
+  - If browser notifications are disabled, show inline UI (e.g., banner at top).
+- Keep notification logic decoupled from React components:
+  - Components call service functions.
+  - Services handle Notification API and scheduling.

@@ -16,26 +16,26 @@ alwaysApply: true
 ## 1. Tech & Architecture
 
 - **Language:** TypeScript everywhere.
-- **Runtime / framework:** 
-  - **Expo** (managed workflow)
-  - **React Native** + **React Native Web**
-- **Primary platform (for now):**
-  - **Web-first**: target desktop browser experience as the main UX.
-  - Later, reuse the same codebase for mobile and potential desktop wrappers.
+- **Framework:** 
+  - **React** (function components + hooks).
+  - Bundler: **Vite** (React + TS template).
+- **Platform (for now):**
+  - **Web-only**: target desktop browser experience as the main UX.
+  - Future desktop wrappers or mobile clients can reuse the domain and state layers.
 
 - **Styling:**
-  - Use **NativeWind** as the primary styling layer.
-  - Tailwind-style utility classes on React Native components.
-  - Centralized design tokens (colors, spacing, typography).
+  - Use **Tailwind CSS** as the primary styling layer.
+  - Utility classes on React components.
+  - Centralized design tokens (colors, spacing, typography) extended via Tailwind theme.
 
 - **Data layer:**
   - Local-first (no backend in v1).
-  - Prefer SQLite (e.g. via Expo-supported solutions) or a small strongly-typed local storage layer.
-  - All persistence behind repositories (no direct storage calls from components).
+  - Use IndexedDB / localStorage behind a small repository layer.
+  - All persistence behind repositories (no direct `localStorage`/`indexedDB` calls from components).
 
 - **AI integration:**
   - OpenAI API.
-  - User provides **their own API key** in a secure settings screen.
+  - User provides **their own API key** in a settings screen.
   - AI calls are wrapped in a dedicated module (`/src/ai`) with:
     - Typed request/response interfaces.
     - Zod validation on responses.
@@ -43,22 +43,23 @@ alwaysApply: true
 
 - **State management:**
   - Use a lightweight store such as **Zustand** for global app state (projects, tasks, settings).
-  - Keep domain logic separate from UI.
+  - Keep domain logic separate from React components (pure functions in `/src/domain`).
 
-- **Routing/navigation:**
-  - Use Expo Router or React Navigation with a clear structure:
+- **Routing:**
+  - Use **React Router** (or similar) with a clear structure:
     - `Home / Dashboard`
     - `Project detail`
     - `Missed tasks`
     - `Settings`
 
-When in doubt: keep it **client-only, web-first, and simple** for v1. Backend and native desktop can be added later.
+When in doubt: keep it **client-only, web-only, and simple** for v1. Backend and native clients can be added later.
 
 ## 2. Domain Concepts (Canonical Names)
 
-Always use these names consistently across code, UI, and prompts:
+Use these names consistently across code, UI, and prompts:
 
 - **Project**: A single goal initiative with:
+  - `id`
   - `title`
   - `description`
   - `startDate`
@@ -66,54 +67,56 @@ Always use these names consistently across code, UI, and prompts:
   - `status` (planned, active, completed, cancelled)
   - `timeframe` breakdown: weekly, monthly, quarterly, final.
 - **Milestone**:
-  - Intermediate “checkpoints” for the project (e.g. “Build MVP”, “Hit X revenue”, “Bench 225x5”).
+  - Intermediate “checkpoints” (e.g. “Build MVP”, “Hit X revenue”, “Bench 225x5”).
   - Each milestone has its own `targetDate`.
-- **Planned Task** (AI-generated):
+- **Task** (planned task, AI-generated or manual):
   - A concrete action item with:
+    - `id`
+    - `projectId`
     - `date` (day planned for)
     - `title`
     - `description`
     - `effortEstimate` (e.g. S/M/L)
     - `status` (pending, done, missed)
 - **Missed Task**:
-  - A planned task that wasn’t completed on its scheduled day.
-  - Moves into a **weekly “Missed Tasks” list**.
+  - A task with `status = "missed"`.
+  - Belongs in a **weekly “Missed Tasks” view**.
   - Missed tasks persist in that weekly bucket until the week ends, then are wiped (per spec).
 - **Progress Metrics**:
-  - Quantitative and/or qualitative fields that can be tracked over time per project.
+  - Quantitative/qualitative fields tracked over time per project.
 - **Schedule metrics**:
   - `daysRemaining`: `targetDate - today`
-  - `daysBehind`: computed based on divergence from the ideal timeline.
+  - `daysBehind`: divergence vs ideal timeline.
 
-These core domain objects should live in a central module like `src/domain`.
+These core domain objects should live in `src/domain`.
 
 ## 3. UX / Behavior Requirements (High-Level)
 
-- **Web-first layout:**
+- **Web-only layout:**
   - Design primarily for desktop browser width (e.g. 1280–1440px).
-  - Use responsive patterns that degrade gracefully on smaller viewports.
+  - Responsive, but optimized for horizontal space.
 
 - **Project creation flow:**
   - User sets:
     - Project name, description.
     - Start date (default: today).
     - Target date (max +365 days).
-  - User optionally describes:
-    - Current level / baseline.
-    - Constraints (time per day/week, resources).
+  - Optional:
+    - Current baseline.
+    - Time constraints (hours per day/week).
   - On submit, AI generates:
-    - A full plan of milestones and tasks across the timeframe.
-    - A daily/weekly structure that is **realistically executable**.
+    - Full plan of milestones and tasks across the timeframe.
+    - Realistically executable daily/weekly structure.
 
 - **AI plan generation:**
-  - Designed so that following it strictly makes failure “unreasonable”.
+  - Following it strictly should make failure “unreasonable”.
   - Includes:
     - Clear milestones.
     - Daily/weekly tasks.
     - Checkpoints to reassess and adjust.
 
 - **Open configuration:**
-  - The project page is heavily editable (like Notion).
+  - Project page is heavily editable (Notion-style).
   - AI can modify **anything** when asked:
     - Regenerate from scratch.
     - Compress timeline.
@@ -122,82 +125,78 @@ These core domain objects should live in a central module like `src/domain`.
 - **Tasks & missed tasks:**
   - Daily recommended tasks are generated on project creation (can be updated).
   - If a task isn’t completed by end of its day:
-    - Move it into that week’s **Missed Tasks** list.
+    - Mark `status = "missed"` and show in this week’s **Missed Tasks** view.
   - At the start of a new week:
-    - Missed tasks list for the previous week is wiped.
+    - Clear the previous week’s missed tasks list.
 
 - **Progress adaptation:**
   - If **behind schedule**:
-    - Surface `daysBehind` and push more urgent / focused recommendations.
+    - Surface `daysBehind` and push catch-up recommendations.
   - If **ahead of schedule**:
-    - Offer options to:
-      - Finish earlier (shorten timeline).
-      - Increase difficulty (harder goals).
+    - Offer:
+      - Earlier completion (shorter timeline).
+      - Higher difficulty.
 
-- **Notifications/reminders (web-first):**
+- **Notifications/reminders (web):**
   - Configurable in settings:
-    - Time-of-day reminders (e.g. via browser notifications / email future).
+    - Time-of-day reminders (via browser notifications).
     - “You are X days behind” nudges.
-  - Must be **opt-in** and respect platform capabilities.
+  - Must be **opt-in** and respect browser permissions.
 
 ## 4. Code Style & Quality
 
 - Strict TypeScript:
   - `"strict": true`
   - Avoid `any`; prefer generics and proper types.
-- Use functional React components and hooks.
+- React:
+  - Function components + hooks.
+  - No class components.
 - Keep components small and composable.
 - **Styles:**
-  - Prefer NativeWind utility classes over inline styles.
-  - Centralize theme tokens (colors, font sizes, radii) and reuse via classes.
-- Write clear docstrings for:
-  - Domain models.
-  - AI prompt/response builders.
-  - Scheduling / progress algorithms.
+  - Use Tailwind utility classes.
+  - Centralize theme tokens in `tailwind.config.ts` and use semantic class names (`bg-surface`, `text-primary`, etc.).
 
-Testing (minimal but real):
+Testing:
 
-- At least unit tests for:
+- Unit tests for:
   - Schedule math (`daysRemaining`, `daysBehind`).
-  - Mapping from AI JSON → internal types.
+  - AI JSON → domain type mapping.
+- Avoid brittle snapshot tests for now; focus on logic.
 
 ## 5. AI Usage – Global Guidelines
 
 - Always **validate model output** with Zod schemas.
 - Fail safely:
   - If AI output is malformed, show a user-friendly error and allow retry.
-- Keep prompts:
+- Prompts:
   - Deterministic and structured.
-  - Focused on the **domain entities** above instead of arbitrary prose.
-- Use **model selection** from user settings:
-  - Provide defaults (e.g., GPT-5 for full plan generation, lighter models for small edits) but let user override.
-- Consider:
-  - Caching AI responses if they are expensive and re-used.
+  - Work with defined domain entities, not arbitrary prose blobs.
+- Model selection:
+  - Configurable in settings; default to a strong model for full-plan generation.
+- Consider caching AI responses that are expensive and re-used.
 
 ## 6. Open Source & Maintainability
 
 - Repo should include:
-  - `README.md` with:
-    - Project vision.
-    - Quickstart.
-    - Architecture overview.
-  - `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md`.
-  - A permissive license (e.g., MIT).
-- Break things into clearly named modules:
+  - `README.md`
+  - `CONTRIBUTING.md`
+  - `CODE_OF_CONDUCT.md`
+  - `LICENSE` (MIT).
+- Modules:
   - `src/domain`
   - `src/ai`
   - `src/state`
   - `src/ui`
   - `src/screens`
-  - `src/services` (notifications, storage).
-- No magic numbers. If a rule is important (e.g., max 365 days, weekly wipe of missed tasks), define it as a constant.
+  - `src/services`
+- No magic numbers:
+  - Use constants for important rules (365 days max, weekly wipe, thresholds for behind/ahead).
 
 ## 7. Cursor-Specific Instructions
 
-- When generating or editing code:
-  - Respect the architecture and type definitions found in `src/domain`.
-  - Prefer to add new small modules over bloating existing ones.
-  - Do not introduce a backend unless a specific task or rule file asks for it.
-- When editing prompt logic:
-  - Keep prompt templates in dedicated files inside `src/ai/prompts`.
-  - Avoid inlining long string literals inside React components.
+- When generating/editing code:
+  - Respect `src/domain` types and `src/state` stores.
+  - Prefer new small modules over bloating old ones.
+- When editing prompts:
+  - Keep prompt templates in `src/ai/prompts`.
+  - Avoid embedding long prompt strings directly in React components.

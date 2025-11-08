@@ -2,72 +2,95 @@
 
 ## Sources of Truth
 
-- The **single source of truth** for domain objects is the **data layer** (SQLite/local store).
+- The **single source of truth** for domain objects is the **data layer** (local persistence).
 - Zustand stores hold:
   - In-memory views/queries of the data.
-  - UI state (selected project, expanded sections, etc.).
-- Never rely on component-local state for canonical project/task data.
+  - UI state (selected project, selected date, filters).
+- Avoid using component-local state for canonical project/task data.
 
-This applies across all platforms, but current implementation is **Expo web-first**.
+This is a **React web app**, but the domain/state design should stay UI-agnostic.
 
 ## State Shape
 
 In `src/state`:
 
 - `useProjectStore`:
-  - Holds:
+  - State:
     - `projects: Project[]`
     - `selectedProjectId: string | null`
-    - CRUD actions: `createProject`, `updateProject`, `deleteProject`.
-    - `setSelectedProjectId`.
+  - Actions:
+    - `createProject`
+    - `updateProject`
+    - `deleteProject`
+    - `setSelectedProjectId`
+
 - `useTaskStore`:
-  - Holds:
+  - State:
     - `tasksByProjectId: Record<ProjectId, Task[]>`
-    - Actions to:
-      - Add tasks.
-      - Update statuses.
-      - Move missed tasks to weekly bucket.
+  - Actions:
+    - `addTask`
+    - `addTasks`
+    - `updateTask`
+    - `deleteTask`
+    - `rolloverMissedTasksForDate(date)`
+    - `clearMissedTasksForWeek(weekIdentifier)`
+
 - `useSettingsStore`:
-  - Holds:
-    - AI model selection.
-    - OpenAI API key (or a reference to where it is stored).
-    - Notification preferences.
-    - Theme preference.
+  - State:
+    - `aiModel`
+    - `openAIApiKey`
+    - `notificationsEnabled`
+    - `notificationTimeOfDay`
+    - `theme` (light/dark/system)
+  - Actions:
+    - `setAiModel`
+    - `setOpenAIApiKey`
+    - `setNotificationsEnabled`
+    - `setNotificationTimeOfDay`
+    - `setTheme`
 
 ## Data Persistence
 
-- Abstract storage behind interfaces in `src/services/storage`:
-  - `ProjectRepository`
-  - `TaskRepository`
-  - `SettingsRepository`
-- Implementation details (SQLite vs async storage) should not leak out of these modules.
+Abstract storage in `src/services/storage`:
+
+- `ProjectRepository`
+- `TaskRepository`
+- `SettingsRepository`
+
+Implementation options (web):
+
+- IndexedDB (via a small wrapper lib or custom implementation).
+- localStorage for simple settings (theme, model selection).
+- Hide implementation details behind clean interfaces so you can swap later.
 
 ## Derived Data
 
-- Derived values like:
-  - `daysRemaining`
-  - `daysBehind`
-  - `completionRate`
-  - `tasksForToday`
-  - `missedTasksThisWeek`
-- Should live in selector functions:
-  - In `src/domain/selectors.ts`.
+Derived values:
 
-Avoid recomputing this logic ad hoc in components.
+- `daysRemaining(project)`
+- `daysBehind(project, taskHistory)`
+- `completionRate(projectId, dateRange)`
+- `tasksForDate(projectId, date)`
+- `missedTasksForCurrentWeek(projectId, date)`
+
+Live in `src/domain/selectors.ts` as pure functions.
+
+Components should **call selectors**, not re-implement logic.
 
 ## Schedule & Missed Tasks Logic
 
-- A “day” is based on user’s local time (start at midnight).
-- Missed tasks flow:
-  - At the end of a day, any `pending` tasks with `scheduledDate < today` move to `status = "missed"` and into that week’s missed list.
-  - At the start of a new week:
-    - Wipe previous week’s missed list.
-- Weeks and boundaries:
-  - Use ISO week or a consistent definition and stick to it; document it in code comments.
+- Day definition: use user’s local timezone; treat “day” as midnight–midnight.
+- Rollover:
+  - At app load (or via explicit daily job), mark any pending tasks whose `date < today` as `missed`.
+- Weekly cleanup:
+  - When detecting a new week:
+    - Clear last week’s missed tasks view (or mark them as expired).
+- Weeks:
+  - Pick a consistent definition (e.g. ISO week or week starting Monday/Sunday).
+  - Document it in code comments and reuse everywhere.
 
 ## Cursor Guidance
 
-- When adding new state:
-  - Prefer to extend existing stores rather than creating dozens of tiny stores.
-- When writing logic dealing with dates:
-  - Centralize helper functions in `src/domain/dates.ts`.
+- When adding new state, prefer extending existing stores over creating many tiny ones.
+- Put date calculations & schedule logic in `src/domain`, not inside React components.
+- Keep side effects (storage writes, notifications) in `src/services` or dedicated hooks.
