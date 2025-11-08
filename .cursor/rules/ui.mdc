@@ -1,7 +1,3 @@
----
-alwaysApply: false
----
-
 # UI & Theming Rules
 
 ## Overall Look & Feel
@@ -19,9 +15,17 @@ Target a hybrid of:
   - Smooth micro-interactions.
   - Subtle motion, not flashy.
 
+## Platform Focus
+
+- **Web-first**:
+  - Primary experience is desktop browser (laptop/monitor).
+  - Layout should assume a wide viewport (e.g. 1200–1440px) and scale down gracefully.
+- Plan designs so they can later map nicely to mobile and native desktop, but **optimize now for web**.
+
 ## Layout Principles
 
-- Main app layout:
+- Main app layout (web):
+
   - Left sidebar:
     - Projects list (with status and days remaining).
     - Quick filters (Active, Completed, Behind schedule).
@@ -39,23 +43,30 @@ Target a hybrid of:
     - “Missed Tasks”
   - Bottom or side: AI “Ask anything” bar.
 
+Use flexbox/grid and NativeWind utility classes to create responsive layouts.
+
 ## Component System
 
 Define and reuse primitives in `src/ui/components`:
 
-- `Button` (primary, secondary, ghost).
-- `Card` (with optional header, body, footer).
-- `Tag` / `Badge` (for statuses).
-- `ProgressBar` (for % of tasks completed).
-- `StatTile` (for key metrics: days remaining, days behind, completion %).
-- `TaskItem` (checkbox, title, subtasks, due status).
-- `SectionHeader` for grouping content.
+- `Button` (primary, secondary, ghost)
+- `Card` (with optional header, body, footer)
+- `Tag` / `Badge` (for statuses)
+- `ProgressBar` (for % of tasks completed)
+- `StatTile` (for key metrics: days remaining, days behind, completion %)
+- `TaskItem` (checkbox, title, subtasks, due status)
+- `SectionHeader` for grouping content
+
+Each should be styled with **NativeWind**:
+
+- Use Tailwind-like classes: e.g. `className="rounded-2xl bg-surface px-4 py-3 shadow-sm"`
+- Keep theme-consistent tokens (colors, radii) referenced via design tokens mapped into classes.
 
 ### Theming
 
 Centralized theme in `src/ui/theme.ts` with tokens:
 
-- Colors (example names, not final values):
+- Colors (example names, not exact values):
   - `color.background`, `color.backgroundAlt`
   - `color.surface`, `color.surfaceAlt`
   - `color.textPrimary`, `color.textSecondary`, `color.textMuted`
@@ -69,12 +80,14 @@ Centralized theme in `src/ui/theme.ts` with tokens:
 - Shadows:
   - `shadow.sm`, `shadow.md` for subtle depth.
 
+Apply these tokens through NativeWind configuration (tailwind config theme extensions) so components can use consistent classes such as `bg-background`, `text-primary`, etc.
+
 Support both **light and dark modes** from day one, with a simple toggle in settings.
 
 ### Interactions
 
 - Task completion:
-  - Checkbox or tap area with subtle animation.
+  - Checkbox or tap area with subtle animation (scale/fade).
   - Completed tasks fade slightly, but remain readable.
 - Missed tasks:
   - Visually distinct (e.g. tag “Missed” + subtle warning color).
@@ -86,8 +99,10 @@ Support both **light and dark modes** from day one, with a simple toggle in sett
 
 - Aim for WCAG AA contrast.
 - Support:
-  - Font size scaling (honor OS settings where possible).
-  - Keyboard navigation (especially for desktop).
+  - Font size scaling (respect browser zoom).
+  - Keyboard navigation:
+    - Focus states on key interactive components.
+    - Tab order that makes sense.
 - Avoid color-only status indicators; always include icon/text.
 
 ### AI Assistant UI
@@ -103,7 +118,7 @@ Support both **light and dark modes** from day one, with a simple toggle in sett
 
 - When adding new components:
   - Put them in `src/ui/components`.
-  - Export from `src/ui/index.ts` for easy imports.
+  - Export them from `src/ui/index.ts` for easy imports.
+- Prefer NativeWind classes over inline styles.
 - Avoid:
-  - Inline styles.
-  - Copy-pasted markup; prefer to refactor shared patterns into components.
+  - Copy-pasted markup; refactor shared patterns into components.

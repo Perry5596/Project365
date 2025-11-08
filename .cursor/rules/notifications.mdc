@@ -1,12 +1,12 @@
----
-alwaysApply: false
----
-
 # Notifications & Reminders Rules
 
 ## Purpose
 
 Implement a **configurable notification system** that nudges users without being obnoxious.
+
+Initial focus is **web**:
+- Use browser notifications where possible.
+- Design APIs so they can later support mobile/native notifications with Expo.
 
 ## Design
 
@@ -15,8 +15,8 @@ Implement a **configurable notification system** that nudges users without being
   - `cancelDailyReminder(id)`
   - `fireImmediateNotification(payload)`
 - This service chooses the underlying platform:
-  - For mobile/Expo: use `expo-notifications` or equivalent.
-  - For desktop (later): use RN Windows/macOS native notifications or fallback.
+  - For web: browser Notification API (with permission checks) or fallback in-app banners.
+  - For mobile/Expo (later): use `expo-notifications` or equivalent.
 
 ## Notification Types
 
@@ -28,12 +28,12 @@ Implement a **configurable notification system** that nudges users without being
 All types should:
 
 - Be toggleable in Settings.
-- Respect OS-level permissions and user choices.
+- Respect platform-level permissions and user choices.
 
 ## Scheduling Rules
 
 - Daily reminder:
-  - Use user-configured local time (e.g. 7:30 AM).
+  - Use user-configured local time.
 - Behind schedule notification:
   - Trigger only once when crossing new thresholds (e.g., 1, 3, 7 days behind).
 - Ahead schedule notification:
@@ -42,4 +42,5 @@ All types should:
 ## Cursor Guidance
 
 - Do not hard-code times; read them from `Settings`.
-- Provide graceful degradation if notifications are not available on the platform.
+- Provide graceful degradation if notifications are not available on the platform:
+  - e.g. show inline in-app banners instead of OS-level notifications.

@@ -1,7 +1,3 @@
----
-alwaysApply: false
----
-
 # AI Planning & Agent Rules
 
 ## Purpose
@@ -10,6 +6,8 @@ These rules govern how we implement:
 - Project creation planning.
 - Plan regeneration.
 - Ongoing AI “agent-like” control over a project’s state.
+
+The AI logic should remain **platform-agnostic** and work identically across web and future platforms.
 
 ## Design Principles
 
@@ -96,4 +94,3 @@ These rules govern how we implement:
 - Every request must include all necessary context:
   - Key project data.
   - Relevant history if needed (summarized, not full logs).
-
