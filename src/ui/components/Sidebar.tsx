@@ -10,6 +10,7 @@ import { cn } from "~/lib/utils";
 interface SidebarProps {
   onCreateProject: () => void;
   onSelectProject: (projectId: string) => void;
+  onNavigateToOverview: () => void;
   selectedProjectId: string | null;
   onSettings: () => void;
 }
@@ -17,6 +18,7 @@ interface SidebarProps {
 export function Sidebar({
   onCreateProject,
   onSelectProject,
+  onNavigateToOverview,
   selectedProjectId,
   onSettings,
 }: SidebarProps) {
@@ -47,10 +49,16 @@ export function Sidebar({
       {/* User Section */}
       <div className="border-b border-border p-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white text-sm font-semibold">
+          <button
+            onClick={onNavigateToOverview}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors cursor-pointer"
+          >
             {userName ? getInitials(userName) : "U"}
-          </div>
-          <div className="flex-1 min-w-0">
+          </button>
+          <button
+            onClick={onNavigateToOverview}
+            className="flex-1 min-w-0 text-left hover:opacity-80 transition-opacity"
+          >
             <p className="truncate text-sm font-medium text-primary">
               {userName || "User"}
             </p>
@@ -58,7 +66,7 @@ export function Sidebar({
               {activeProjects.length} active project
               {activeProjects.length !== 1 ? "s" : ""}
             </p>
-          </div>
+          </button>
           <button
             onClick={onSettings}
             className="rounded-lg p-1.5 text-muted hover:bg-surface-alt transition-colors"

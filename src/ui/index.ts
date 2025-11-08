@@ -9,10 +9,15 @@ export { SectionHeader, type SectionHeaderProps } from "./components/SectionHead
 export { Sidebar } from "./components/Sidebar";
 export { WelcomeScreen } from "./components/WelcomeScreen";
 export { OnboardingScreen } from "./components/OnboardingScreen";
-export { DashboardBanner } from "./components/DashboardBanner";
-export { DashboardScreen } from "./components/DashboardScreen";
+export { NavBar } from "./components/NavBar";
+export { OverviewScreen } from "./components/OverviewScreen";
 export { ProjectCreationForm } from "./components/ProjectCreationForm";
 export { ProjectCreationLoading } from "./components/ProjectCreationLoading";
 export { ProjectDetailScreen } from "./components/ProjectDetailScreen";
 export { SettingsScreen } from "./components/SettingsScreen";
+export { AIChat } from "./components/AIChat";
+export { EditableTaskItem } from "./components/EditableTaskItem";
+export { DraggableTaskList } from "./components/DraggableTaskList";
+export { NewTaskForm } from "./components/NewTaskForm";
+export { SortableItem } from "./components/SortableItem";
 

@@ -6,8 +6,8 @@ import { useProjectStore } from "~/state/useProjectStore";
 import { WelcomeScreen } from "~/ui/components/WelcomeScreen";
 import { OnboardingScreen } from "~/ui/components/OnboardingScreen";
 import { Sidebar } from "~/ui/components/Sidebar";
-import { DashboardBanner } from "~/ui/components/DashboardBanner";
-import { DashboardScreen } from "~/ui/components/DashboardScreen";
+import { NavBar } from "~/ui/components/NavBar";
+import { OverviewScreen } from "~/ui/components/OverviewScreen";
 import { ProjectCreationForm } from "~/ui/components/ProjectCreationForm";
 import { ProjectCreationLoading } from "~/ui/components/ProjectCreationLoading";
 import { ProjectDetailScreen } from "~/ui/components/ProjectDetailScreen";
@@ -16,7 +16,7 @@ import { SettingsScreen } from "~/ui/components/SettingsScreen";
 type AppScreen =
   | "welcome"
   | "onboarding"
-  | "dashboard"
+  | "overview"
   | "create-project"
   | "creating-project"
   | "project-detail"
@@ -41,7 +41,7 @@ export default function Home() {
       if (selectedProjectId) {
         setScreen("project-detail");
       } else {
-        setScreen("dashboard");
+        setScreen("overview");
       }
     } else {
       setScreen("welcome");
@@ -53,7 +53,7 @@ export default function Home() {
   };
 
   const handleOnboardingComplete = () => {
-    setScreen("dashboard");
+    setScreen("overview");
   };
 
   const handleCreateProject = () => {
@@ -127,6 +127,8 @@ export default function Home() {
         date: dateStr!,
         status: "pending" as const,
         effortEstimate: (["S", "M", "L"] as const)[i % 3],
+        importance: (i % 5) + 1 as 1 | 2 | 3 | 4 | 5,
+        order: i,
       };
     });
 
@@ -153,9 +155,14 @@ export default function Home() {
     setScreen("settings");
   };
 
-  const handleBackToDashboard = () => {
+  const handleBackToOverview = () => {
     setSelectedProjectId(null);
-    setScreen("dashboard");
+    setScreen("overview");
+  };
+
+  const handleNavigateToOverview = () => {
+    setSelectedProjectId(null);
+    setScreen("overview");
   };
 
   // Welcome and Onboarding screens (full screen)
@@ -171,7 +178,7 @@ export default function Home() {
     return (
       <ProjectCreationForm
         onContinue={handleProjectFormContinue}
-        onCancel={handleBackToDashboard}
+        onCancel={handleBackToOverview}
       />
     );
   }
@@ -191,20 +198,16 @@ export default function Home() {
       <Sidebar
         onCreateProject={handleCreateProject}
         onSelectProject={handleSelectProject}
+        onNavigateToOverview={handleNavigateToOverview}
         selectedProjectId={selectedProjectId}
         onSettings={handleSettings}
       />
       <div className="flex flex-1 flex-col overflow-hidden">
         {screen !== "settings" && (
-          <DashboardBanner onCreateProject={handleCreateProject} />
+          <NavBar onCreateProject={handleCreateProject} />
         )}
         <div className="flex-1 overflow-hidden">
-          {screen === "dashboard" && (
-            <DashboardScreen
-              onCreateProject={handleCreateProject}
-              onSelectProject={handleSelectProject}
-            />
-          )}
+          {screen === "overview" && <OverviewScreen />}
           {screen === "project-detail" && selectedProjectId && (
             <ProjectDetailScreen projectId={selectedProjectId} />
           )}
