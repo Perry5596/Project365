@@ -5,6 +5,7 @@
 <p><strong>AI-assisted, open source goal tracker and strategist for the next 365 days of your life.</strong></p>
 
 <!-- Badges -->
+
 <p>
   <img alt="Status" src="https://img.shields.io/badge/status-early%20development-orange">
   <img alt="Platform" src="https://img.shields.io/badge/platform-web%20first-blue">
