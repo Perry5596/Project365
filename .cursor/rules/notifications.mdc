@@ -1,0 +1,45 @@
+---
+alwaysApply: false
+---
+
+# Notifications & Reminders Rules
+
+## Purpose
+
+Implement a **configurable notification system** that nudges users without being obnoxious.
+
+## Design
+
+- Abstract notifications behind a service in `src/services/notifications`:
+  - `scheduleDailyReminder(timeOfDay, payload)`
+  - `cancelDailyReminder(id)`
+  - `fireImmediateNotification(payload)`
+- This service chooses the underlying platform:
+  - For mobile/Expo: use `expo-notifications` or equivalent.
+  - For desktop (later): use RN Windows/macOS native notifications or fallback.
+
+## Notification Types
+
+- Daily “Today’s plan” reminder.
+- “You are X days behind” alert.
+- “You’re ahead of schedule—want to tighten your deadline or ramp up?” prompt.
+- Optional “Weekly review” reminder.
+
+All types should:
+
+- Be toggleable in Settings.
+- Respect OS-level permissions and user choices.
+
+## Scheduling Rules
+
+- Daily reminder:
+  - Use user-configured local time (e.g. 7:30 AM).
+- Behind schedule notification:
+  - Trigger only once when crossing new thresholds (e.g., 1, 3, 7 days behind).
+- Ahead schedule notification:
+  - Trigger when ahead by a configured threshold (e.g., 7 days).
+
+## Cursor Guidance
+
+- Do not hard-code times; read them from `Settings`.
+- Provide graceful degradation if notifications are not available on the platform.

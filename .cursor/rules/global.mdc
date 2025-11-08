@@ -1,0 +1,186 @@
+---
+alwaysApply: true
+---
+
+# Project 365 – Global Rules
+
+## 0. Vision
+
+- This is an **AI-assisted goal tracker, planner, and strategist** for achieving any goal within **≤365 days**.
+- The app should feel like a mix of **Notion + Cal.com/CalAI + useMotion**:
+  - Minimal, clean, block-based layouts
+  - Soft, modern typography
+  - Strong focus on clarity: “What do I need to do today to stay on track?”
+- The core promise: **if the user follows the plan to the letter, it should be unreasonable that they fail.**
+
+## 1. Tech & Architecture
+
+- **Language:** TypeScript everywhere.
+- **Client:** React Native (with Expo), organized to support:
+  - Mobile and web in dev.
+  - Future expansion to Windows/macOS via React Native for Windows / native shells.
+- **Data layer:**
+  - Local-first (no backend in v1).
+  - Prefer SQLite (e.g. via `expo-sqlite` or similar) or a small strongly-typed local storage layer.
+- **AI integration:**
+  - OpenAI API.
+  - User provides **their own API key** in a secure settings screen.
+  - AI calls are wrapped in a dedicated module (`/src/ai`) with:
+    - Typed request/response interfaces.
+    - Zod validation on responses.
+    - Clear separation between prompt building and app logic.
+- **State management:**
+  - Use a lightweight store such as **Zustand** for global app state (projects, tasks, settings).
+  - Use React Query (TanStack Query) only if/when a remote backend is added later.
+- **Routing/navigation:**
+  - Use React Navigation or Expo Router with a clear structure:
+    - `Home / Dashboard`
+    - `Project detail`
+    - `Missed tasks`
+    - `Settings`
+
+When in doubt: keep it **client-only and simple** for v1. We can layer tRPC + backend later.
+
+## 2. Domain Concepts (Canonical Names)
+
+Always use these names consistently across code, UI, and prompts:
+
+- **Project**: A single goal initiative with:
+  - `title`
+  - `description`
+  - `startDate`
+  - `targetDate` (≤ 365 days from start; may be shorter)
+  - `status` (planned, active, completed, cancelled)
+  - `timeframe` breakdown: weekly, monthly, quarterly, final.
+- **Milestone**:
+  - Intermediate “checkpoints” for the project (e.g. “Build MVP”, “Hit X revenue”, “Bench 225x5”).
+  - Each milestone has its own `targetDate`.
+- **Planned Task** (AI-generated):
+  - A concrete action item with:
+    - `date` (day planned for)
+    - `title`
+    - `description`
+    - `effortEstimate` (e.g. S/M/L)
+    - `status` (pending, done, missed)
+- **Missed Task**:
+  - A planned task that wasn’t completed on its scheduled day.
+  - Moves into a **weekly “Missed Tasks” list**.
+  - Missed tasks persist in that weekly bucket until the week ends, then are wiped (per spec).
+- **Progress Metrics**:
+  - Quantitative and/or qualitative fields that can be tracked over time per project.
+- **Schedule metrics**:
+  - `daysRemaining`: `targetDate - today`
+  - `daysBehind`: computed based on divergence from the ideal timeline.
+
+These core domain objects should live in a central module like `src/domain`.
+
+## 3. UX / Behavior Requirements (High-Level)
+
+- **Project creation flow:**
+  - User sets:
+    - Project name, description.
+    - Start date (default: today).
+    - Target date (max +365 days).
+  - User optionally describes:
+    - Current level / baseline.
+    - Constraints (time per day/week, resources).
+  - On submit, AI generates:
+    - A full plan of milestones and tasks across the timeframe.
+    - A daily/weekly structure that is **realistically executable**.
+- **AI plan generation:**
+  - Designed so that following it strictly makes failure “unreasonable”.
+  - Includes:
+    - Clear milestones.
+    - Daily/weekly tasks.
+    - Checkpoints to reassess and adjust.
+- **Open configuration:**
+  - The project page is heavily editable (like Notion).
+  - AI can modify **anything** when asked:
+    - Regenerate from scratch.
+    - Compress timeline.
+    - Adjust difficulty if user is ahead.
+- **Tasks & missed tasks:**
+  - Daily recommended tasks are generated on project creation (can be updated).
+  - If a task isn’t completed by end of its day:
+    - Move it into that week’s **Missed Tasks** list.
+  - At the start of a new week:
+    - Missed tasks list for the previous week is wiped.
+- **Progress adaptation:**
+  - If **behind schedule**:
+    - Surface `daysBehind` and push more urgent / focused recommendations.
+  - If **ahead of schedule**:
+    - Offer options to:
+      - Finish earlier (shorten timeline).
+      - Increase difficulty (harder goals).
+- **Notifications/reminders:**
+  - Configurable in settings:
+    - Time-of-day reminders.
+    - “You are X days behind” nudges.
+    - “You’re ahead; want to ramp up?” prompts.
+  - Must be **opt-in** and respect OS notification settings.
+
+## 4. Code Style & Quality
+
+- Strict TypeScript:
+  - `"strict": true`
+  - Avoid `any`; prefer generics and proper types.
+- Use functional React components and hooks.
+- Keep components small and presentational where possible.
+- Use a central **design system**:
+  - Color tokens (light/dark).
+  - Typographic scale.
+  - Component primitives for:
+    - Buttons, cards, list items, tags, chips, progress bars.
+- Prefer **composition over inheritance**.
+- Write clear docstrings for:
+  - Domain models.
+  - AI prompt/response builders.
+  - Scheduling / progress algorithms.
+
+Testing (minimal but real):
+
+- At least unit tests for:
+  - Schedule math (`daysRemaining`, `daysBehind`).
+  - Mapping from AI JSON → internal types.
+- Avoid brittle snapshot tests for UI early on; focus on logic.
+
+## 5. AI Usage – Global Guidelines
+
+- Always **validate model output** with Zod schemas.
+- Fail safely:
+  - If AI output is malformed, show a user-friendly error and allow retry.
+- Keep prompts:
+  - Deterministic and structured.
+  - Focused on the **domain entities** above instead of arbitrary prose.
+- Use **model selection** from user settings:
+  - Provide defaults (e.g., GPT-5 for full plan generation, lighter models for small edits) but let user override.
+- Consider:
+  - Caching AI responses if they are expensive and re-used.
+
+## 6. Open Source & Maintainability
+
+- Repo should include:
+  - `README.md` with:
+    - Project vision.
+    - Quickstart.
+    - Architecture overview.
+  - `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md`.
+  - A permissive license (e.g., MIT).
+- Break things into clearly named modules:
+  - `src/domain`
+  - `src/ai`
+  - `src/state`
+  - `src/ui`
+  - `src/screens`
+  - `src/services` (notifications, storage).
+- No magic numbers. If a rule is important (e.g., max 365 days, weekly wipe of missed tasks), define it as a constant.
+
+## 7. Cursor-Specific Instructions
+
+- When generating or editing code:
+  - Respect the architecture and type definitions found in `src/domain`.
+  - Prefer to add new small modules over bloating existing ones.
+  - Do not introduce a backend or tRPC unless a specific task or rule file asks for it.
+- When editing prompt logic:
+  - Keep prompt templates in dedicated files inside `src/ai/prompts`.
+  - Avoid inlining long string literals inside React components.

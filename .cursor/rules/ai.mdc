@@ -1,0 +1,99 @@
+---
+alwaysApply: false
+---
+
+# AI Planning & Agent Rules
+
+## Purpose
+
+These rules govern how we implement:
+- Project creation planning.
+- Plan regeneration.
+- Ongoing AI “agent-like” control over a project’s state.
+
+## Design Principles
+
+- All AI interaction goes through **typed functions** in `src/ai/`.
+- The client never sends raw internal state directly as JSON without:
+  - Filtering to the minimum needed fields.
+  - Respecting user privacy.
+- AI outputs must be **pure data** (JSON) that maps to domain types:
+  - `AiGeneratedPlan`
+  - `AiPlanUpdate`
+  - `AiTaskSuggestions`
+
+## Core Modules
+
+- `src/ai/openaiClient.ts`
+  - Wraps the OpenAI SDK.
+  - Uses user’s API key from secure settings.
+  - Handles retry/backoff.
+- `src/ai/prompts/`
+  - `createProjectPlanPrompt.ts`
+  - `updatePlanPrompt.ts`
+  - `rescheduleFromMissedTasksPrompt.ts`
+- `src/ai/types.ts`
+  - `AiProjectPlan` (milestones, tasks, rationale).
+  - `AiMilestone`, `AiPlannedTask`.
+- `src/ai/planGenerator.ts`
+  - `generateInitialPlan(goalInput): Promise<AiProjectPlan>`
+  - `regeneratePlan(projectId, instructions): Promise<AiProjectPlan>`
+  - `adjustPlanForProgress(projectState, instructions): Promise<AiPlanUpdate>`
+
+## Prompt Structure
+
+- Prompts should:
+  - Explicitly define:
+    - Project goal.
+    - Timebox (start date, target date, ≤365 days).
+    - User constraints (hours per day/week).
+  - Ask for a **strict JSON** response:
+    - No prose.
+    - No explanations.
+  - Use few-shot examples if needed for schema clarity.
+
+- Example high-level instructions to the model:
+  - “Your job is to produce a plan such that if the user follows every task, it is unreasonable for them to fail.”
+  - “Break the 365-day or shorter window into milestones (monthly/quarterly) and daily/weekly tasks.”
+  - “Each task should be small, actionable, and realistically completable in a day given user constraints.”
+
+## JSON Response Requirements
+
+- Responses must match Zod schemas in `src/ai/schemas.ts`:
+  - `zProjectPlan`, `zMilestone`, `zPlannedTask`.
+- If parsing/validation fails:
+  - Log the error.
+  - Return a user-visible message: “The AI’s plan came back malformed. Try again?”
+  - Do not blindly accept or partially apply invalid data.
+
+## Agent-like Control
+
+- “Agent-like” behavior is implemented as **explicit commands**, not a long-lived autonomous agent.
+- Examples of user actions:
+  - “Shorten this goal to 120 days.”
+  - “Increase difficulty by 20%.”
+  - “Change focus from strength to endurance.”
+- Flow:
+  - Build a command object (`AiPlanCommand`) that includes:
+    - Current project snapshot (minimal necessary fields).
+    - User instructions.
+    - Constraints (time, difficulty, deadlines).
+  - Send to model and receive `AiPlanUpdate`.
+  - Apply update via pure functions in `src/domain/planUpdater.ts`.
+
+## Model Selection
+
+- Respect user’s model setting from `settings.aiModel`:
+  - Default: powerful model (e.g. GPT-5) for full plan gen.
+  - Allow lighter models for:
+    - Small tweaks (e.g. “rewrite this milestone name”).
+- The AI layer should choose models via:
+  - `selectModelForTask(taskType: "fullPlan" | "minorUpdate" | "explanation")`.
+
+## No Hidden State
+
+- AI should **not rely on implicit state** stored in prompts.
+- Every request must include all necessary context:
+  - Key project data.
+  - Relevant history if needed (summarized, not full logs).
+

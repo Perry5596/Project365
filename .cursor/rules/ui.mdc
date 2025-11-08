@@ -1,0 +1,109 @@
+---
+alwaysApply: false
+---
+
+# UI & Theming Rules
+
+## Overall Look & Feel
+
+Target a hybrid of:
+
+- **Notion**:
+  - Clean, minimal.
+  - Blocks/cards, translucent panels.
+- **Cal.com / CalAI**:
+  - Subtle rounded corners.
+  - Strong but soft typography.
+  - Clear emphasis on primary actions.
+- **useMotion**:
+  - Smooth micro-interactions.
+  - Subtle motion, not flashy.
+
+## Layout Principles
+
+- Main app layout:
+  - Left sidebar:
+    - Projects list (with status and days remaining).
+    - Quick filters (Active, Completed, Behind schedule).
+  - Main content:
+    - Project overview, timeline, tasks, missed tasks.
+  - Right-side panel (optional):
+    - AI assistant pane or project insights.
+
+- Within a project:
+  - Top: Project header (title, goal summary, days remaining, days behind/ahead).
+  - Middle: Tabs or sections:
+    - “Today”
+    - “Week”
+    - “Plan” (milestones)
+    - “Missed Tasks”
+  - Bottom or side: AI “Ask anything” bar.
+
+## Component System
+
+Define and reuse primitives in `src/ui/components`:
+
+- `Button` (primary, secondary, ghost).
+- `Card` (with optional header, body, footer).
+- `Tag` / `Badge` (for statuses).
+- `ProgressBar` (for % of tasks completed).
+- `StatTile` (for key metrics: days remaining, days behind, completion %).
+- `TaskItem` (checkbox, title, subtasks, due status).
+- `SectionHeader` for grouping content.
+
+### Theming
+
+Centralized theme in `src/ui/theme.ts` with tokens:
+
+- Colors (example names, not final values):
+  - `color.background`, `color.backgroundAlt`
+  - `color.surface`, `color.surfaceAlt`
+  - `color.textPrimary`, `color.textSecondary`, `color.textMuted`
+  - `color.accent`, `color.accentSoft`
+  - `color.danger`, `color.warning`, `color.success`
+- Typography:
+  - `font.heading`, `font.body`, `font.mono`
+  - Sizes: `xs, sm, md, lg, xl, 2xl, 3xl`
+- Radii:
+  - `radius.sm`, `radius.md`, `radius.lg`, `radius.xl` (cards/buttons should feel soft, e.g. `radius.lg`).
+- Shadows:
+  - `shadow.sm`, `shadow.md` for subtle depth.
+
+Support both **light and dark modes** from day one, with a simple toggle in settings.
+
+### Interactions
+
+- Task completion:
+  - Checkbox or tap area with subtle animation.
+  - Completed tasks fade slightly, but remain readable.
+- Missed tasks:
+  - Visually distinct (e.g. tag “Missed” + subtle warning color).
+- “Days remaining” & “days behind”:
+  - Always visible in project header.
+  - “Behind” uses warning/danger color; “Ahead” uses success/positive color.
+
+### Accessibility
+
+- Aim for WCAG AA contrast.
+- Support:
+  - Font size scaling (honor OS settings where possible).
+  - Keyboard navigation (especially for desktop).
+- Avoid color-only status indicators; always include icon/text.
+
+### AI Assistant UI
+
+- AI interaction should:
+  - Live in a panel with chat-like UI, but focused on **commands that modify the project**.
+  - Allow user to:
+    - Preview changes before applying when possible.
+  - Show:
+    - “Summary of change” before committing.
+
+### Cursor Guidance
+
+- When adding new components:
+  - Put them in `src/ui/components`.
+  - Export from `src/ui/index.ts` for easy imports.
+- Avoid:
+  - Inline styles.
+  - Copy-pasted markup; prefer to refactor shared patterns into components.

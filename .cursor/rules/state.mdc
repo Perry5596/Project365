@@ -1,0 +1,75 @@
+---
+alwaysApply: false
+---
+
+# State & Data Rules
+
+## Sources of Truth
+
+- The **single source of truth** for domain objects is the **data layer** (SQLite/local store).
+- Zustand stores hold:
+  - In-memory views/queries of the data.
+  - UI state (selected project, expanded sections, etc.).
+- Never rely on component-local state for canonical project/task data.
+
+## State Shape
+
+In `src/state`:
+
+- `useProjectStore`:
+  - Holds:
+    - `projects: Project[]`
+    - `selectedProjectId: string | null`
+    - CRUD actions: `createProject`, `updateProject`, `deleteProject`.
+    - `setSelectedProjectId`.
+- `useTaskStore`:
+  - Holds:
+    - `tasksByProjectId: Record<ProjectId, Task[]>`
+    - Actions to:
+      - Add tasks.
+      - Update statuses.
+      - Move missed tasks to weekly bucket.
+- `useSettingsStore`:
+  - Holds:
+    - AI model selection.
+    - OpenAI API key (or a reference to where it is stored).
+    - Notification preferences.
+    - Theme preference.
+
+## Data Persistence
+
+- Abstract storage behind interfaces in `src/services/storage`:
+  - `ProjectRepository`
+  - `TaskRepository`
+  - `SettingsRepository`
+- Implementation details (SQLite vs async storage) should not leak out of these modules.
+
+## Derived Data
+
+- Derived values like:
+  - `daysRemaining`
+  - `daysBehind`
+  - `completionRate`
+  - `tasksForToday`
+  - `missedTasksThisWeek`
+- Should live in selector functions:
+  - In `src/domain/selectors.ts`.
+
+Avoid recomputing this logic ad hoc in components.
+
+## Schedule & Missed Tasks Logic
+
+- A “day” is based on user’s local time (start at midnight).
+- Missed tasks flow:
+  - At the end of a day, any `pending` tasks with `scheduledDate < today` move to `status = "missed"` and into that week’s missed list.
+  - At the start of a new week:
+    - Wipe previous week’s missed list.
+- Weeks and boundaries:
+  - Use ISO week or a consistent definition and stick to it; document it in code comments.
+
+## Cursor Guidance
+
+- When adding new state:
+  - Prefer to extend existing stores rather than creating dozens of tiny stores.
+- When writing logic dealing with dates:
+  - Centralize helper functions in `src/domain/dates.ts`.
